@@ -1,0 +1,4 @@
+[quote, Fred Brooks]
+____
+What one programmer can do in one month, two programmers can do in two months.
+____

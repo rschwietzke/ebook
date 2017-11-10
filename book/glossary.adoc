@@ -1,0 +1,9 @@
+== Glossary
+
+[glossary]
+git:: 
+    "a fast, scalable, distributed revision control system with an unusually rich command set" - `man git`
+localhost:: 
+    A special URL aliased to 127.0.0.1 ("loopback" address), which only ever points to your machine
+REST::
+    "Representational state transfer" - an API paradigm which exposes data as "resources"

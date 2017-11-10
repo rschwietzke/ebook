@@ -1,0 +1,25 @@
+= Your Book Title Here
+Your Name <your.email@example.com>
+v1.0, November 2017: Preview.
+:doctype:   book
+:publication-type: book
+:docinfo:
+:toc:
+:toclevels: 3
+:icons: font
+:imagesdir: images
+:front-cover-image: image:cover.png[Front Cover,900,1165]
+:sectnums:
+:numbered!:
+
+Preview Only
+------------
+
+This is a preview of "Your Book Title Here". If you'd like to purchase a full copy, please visit https://yoursite.com.
+
+:numbered:
+
+include::book/01/introduction.adoc[]
+include::book/02/cheatsheet.adoc[]
+
+'''

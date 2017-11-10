@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    echo "Builds HTML and additional optional artifacts for this book" && \
+    echo "usage:" && \
+    echo "$0 [options]" && \
+    echo "    Options:"
+    grep "[[:space:]].)\ #" $0 | tr -d "#" | sed -r 's/( \| \*)//' | sed -r 's/([a-z])\)/-\1/';
+    exit 0;
+}
+
+export ASCIIDOCTOR_VERSION=1.5.5
+
+root=$(cd $(dirname "${BASH_SOURCE}") && pwd)
+
+# If no args, print usage and exit
+[ $# -eq 0 ] && usage
+main_file=""
+epub=0
+pdf=0
+kindle=0
+docbook=0
+
+while getopts ":hf:epkdg" arg; do
+  case ${arg} in
+    f) # Required. Specify input filename.
+      main_file=${OPTARG}
+      ;;
+    e) # Generate epub3 output.
+      epub=1
+      ;;
+    p) # Generate pdf output.
+      pdf=1
+      ;;
+    k) # Generate kindle output.
+      kindle=1
+      ;;
+    d) # Generate docbook output.
+      docbook=1
+      ;;
+    g) # Install required gems and bail.
+      gem install --no-document prawn --version 2.1.0 \
+        && gem install --no-document asciidoctor-epub3 --version 1.5.0.alpha.6 \
+        && gem install --no-document asciidoctor-pdf --version 1.5.0.alpha.15 \
+        && gem install --no-document epubcheck --version 3.0.1 \
+        && gem install --no-document kindlegen --version 3.0.3 \
+        && gem install --no-document asciidoctor-revealjs \
+        && gem install --no-document asciidoctor-diagram \
+        && gem install --no-document asciidoctor-confluence \
+        && gem install --no-document rake rouge coderay thread_safe slim haml tilt
+        exit 0
+      ;;
+    h | *) # Display help.
+      usage
+      exit 0
+      ;;
+  esac
+done
+
+[ -z "${root}/${main_file}" ] && usage
+[ -f ${root}/${main_file} ] ||  { echo "Can't read file ${root}/${main_file}." ; exit 1 ; }
+
+echo "Building HTML" && asciidoctor -a icons=font "${root}/${main_file}"
+[ -f ${root}/preview.adoc ] && echo "Building HTML (Preview)" && \
+  asciidoctor -a icons=font -a theme=riak -a stylesheet=./theme/maker.css "${root}/preview.adoc"
+[ $pdf -eq 1 ] && echo "Building PDF" && asciidoctor-pdf -a icons=font "${root}/${main_file}"
+[ $epub -eq 1 ] && echo "Building EPUB3" && asciidoctor-epub3 "${root}/${main_file}"
+[ $kindle -eq 1 ] && echo "Building Kindle" && asciidoctor-epub3 -a ebook-format=kf8 -o "${main_file%.*}.mobi" "${root}/${main_file}"
+[ $docbook -eq 1 ] && echo "Building Docbook" && asciidoctor -b docbook "${root}/${main_file}"
